@@ -1,0 +1,327 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\newcommand{\studentname}{Xilang Chen}
+\newcommand{\studentid}{524031910668}
+
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\newcommand{\Mod}[1]{\ (\mathrm{mod}\ #1)}
+
+\newtheorem*{fact}{Fact}
+\theoremstyle{definition}
+\newtheorem*{remark}{Remark}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+
+\title{SE3308 Algorithm Design I --- Assignment 1\\[0.3em]
+  \large Exercises 0.1, 0.2, 1.14, 1.20, 1.31, 1.35}
+\author{\studentname\ifx\studentid\empty\else\quad\studentid\fi}
+\date{}
+
+\begin{document}
+\maketitle
+
+Throughout, $\log$ denotes $\log_2$ and $\ln$ the natural logarithm.
+
+%======================================================================
+\section*{Exercise 0.1}
+
+We use the following standard facts.
+
+\begin{fact}[Limit rule]
+Let $f,g>0$ and suppose $L=\lim_{n\to\infty} f(n)/g(n)$ exists in $[0,\infty]$.
+If $0<L<\infty$ then $f=\Theta(g)$; if $L=0$ then $f=O(g)$ but $f\neq\Omega(g)$;
+if $L=\infty$ then $f=\Omega(g)$ but $f\neq O(g)$.
+\end{fact}
+
+\begin{fact}[Logs vs.\ polynomials]
+For any constants $a,b>0$, $\lim_{n\to\infty}(\log n)^b/n^a=0$.
+(Substituting $n=2^t$, this is $t^b/2^{at}\to 0$: an exponential beats any polynomial.)
+\end{fact}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{clll}
+\toprule
+ & $f(n)$ & $g(n)$ & Answer \\
+\midrule
+(a) & $n-100$ & $n-200$ & $f=\Theta(g)$ \\
+(b) & $n^{1/2}$ & $n^{2/3}$ & $f=O(g)$ \\
+(c) & $100n+\log n$ & $n+(\log n)^2$ & $f=\Theta(g)$ \\
+(d) & $n\log n$ & $10n\log 10n$ & $f=\Theta(g)$ \\
+(e) & $\log 2n$ & $\log 3n$ & $f=\Theta(g)$ \\
+(f) & $10\log n$ & $\log(n^2)$ & $f=\Theta(g)$ \\
+(g) & $n^{1.01}$ & $n\log^2 n$ & $f=\Omega(g)$ \\
+(h) & $n^2/\log n$ & $n(\log n)^2$ & $f=\Omega(g)$ \\
+(i) & $n^{0.1}$ & $(\log n)^{10}$ & $f=\Omega(g)$ \\
+(j) & $(\log n)^{\log n}$ & $n/\log n$ & $f=\Omega(g)$ \\
+(k) & $\sqrt n$ & $(\log n)^3$ & $f=\Omega(g)$ \\
+(l) & $n^{1/2}$ & $5^{\log_2 n}$ & $f=O(g)$ \\
+(m) & $n2^n$ & $3^n$ & $f=O(g)$ \\
+(n) & $2^n$ & $2^{n+1}$ & $f=\Theta(g)$ \\
+(o) & $n!$ & $2^n$ & $f=\Omega(g)$ \\
+(p) & $(\log n)^{\log n}$ & $2^{(\log_2 n)^2}$ & $f=O(g)$ \\
+(q) & $\sum_{i=1}^n i^k$ & $n^{k+1}$ & $f=\Theta(g)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Wherever the answer is only $O$ or only $\Omega$, the other relation fails (the ratio tends to $0$ or $\infty$).
+
+\textbf{Justifications.}
+\begin{enumerate}[label=(\alph*), leftmargin=2.2em, itemsep=0.25em]
+\item $\dfrac{n-100}{n-200}\to 1$.
+\item $\dfrac{n^{1/2}}{n^{2/3}}=n^{-1/6}\to 0$.
+\item $\dfrac{100n+\log n}{n+(\log n)^2}=\dfrac{100+(\log n)/n}{1+(\log n)^2/n}\to 100$.
+\item $\dfrac{n\log n}{10n\log(10n)}=\dfrac{\log n}{10(\log n+\log 10)}\to\dfrac1{10}$.
+\item $\dfrac{\log 2n}{\log 3n}=\dfrac{1+\log n}{\log 3+\log n}\to 1$.
+\item $\log(n^2)=2\log n$, so $f/g=5$ exactly.
+\item $\dfrac{n^{1.01}}{n\log^2 n}=\dfrac{n^{0.01}}{(\log n)^2}\to\infty$.
+\item $\dfrac{n^2/\log n}{n(\log n)^2}=\dfrac{n}{(\log n)^3}\to\infty$.
+\item $\dfrac{n^{0.1}}{(\log n)^{10}}\to\infty$.
+\item $(\log n)^{\log n}=2^{\log n\cdot\log\log n}=n^{\log\log n}$. For $n\ge 16$, $\log\log n\ge 2$, so
+  $\dfrac{f}{g}=n^{\log\log n-1}\log n\ge n\to\infty$.
+\item $\dfrac{\sqrt n}{(\log n)^3}\to\infty$.
+\item $5^{\log_2 n}=2^{\log_2 5\cdot\log_2 n}=n^{\log_2 5}$ with $\log_2 5\approx 2.32$, so
+  $f/g=n^{1/2-\log_2 5}\to 0$.
+\item $\dfrac{n2^n}{3^n}=n\left(\tfrac23\right)^n\to 0$.
+\item $2^{n+1}=2\cdot 2^n$, so $f/g=\tfrac12$.
+\item $\dfrac{n!}{2^n}=\prod_{i=1}^n\dfrac i2\ge\dfrac12\left(\dfrac32\right)^{n-2}\to\infty$ for $n\ge2$
+  (the first factor is $\tfrac12$, the second is $1$, and every later factor is at least $\tfrac32$).
+\item As in (j), $f=2^{\log n\cdot\log\log n}$, while $g=2^{(\log n)^2}$. Hence
+  $f/g=2^{-\log n\,(\log n-\log\log n)}\to 0$, since $\log n-\log\log n\to\infty$.
+\item Here $k\ge 0$ is a fixed constant. Upper bound: each of the $n$ terms is at most $n^k$, so
+  $\sum_{i=1}^n i^k\le n^{k+1}$. Lower bound: the terms with $i\ge\ceil{n/2}$ number at least $n/2$
+  and each is at least $(n/2)^k$, so $\sum_{i=1}^n i^k\ge (n/2)^{k+1}=2^{-(k+1)}n^{k+1}$.
+  Thus $f=\Theta(n^{k+1})$.
+\end{enumerate}
+
+\begin{remark}
+Changing the base of a logarithm multiplies it by a constant, so none of the answers depend on the base
+(in (j) and (p) the logarithm is in the exponent, but the same comparisons go through with $\ln$).
+\end{remark}
+
+%======================================================================
+\section*{Exercise 0.2}
+
+Let $g(n)=\sum_{i=0}^{n}c^i$ with $c>0$. All terms are positive.
+
+\begin{enumerate}[label=(\alph*), leftmargin=2.2em]
+\item $c<1$. Since $g(n)$ contains the term $1$ and all terms are positive, $g(n)\ge 1$. Also
+  \[
+    g(n)\le\sum_{i=0}^{\infty}c^i=\frac{1}{1-c},
+  \]
+  a constant independent of $n$. Hence $1\le g(n)\le\frac1{1-c}$ for all $n$, i.e.\ $g(n)=\Theta(1)$.
+
+\item $c=1$. Every term equals $1$, so $g(n)=n+1$. For $n\ge1$, $n\le n+1\le 2n$, hence $g(n)=\Theta(n)$.
+
+\item $c>1$. The last term gives $g(n)\ge c^n$. By the geometric sum formula,
+  \[
+    g(n)=\frac{c^{n+1}-1}{c-1}<\frac{c^{n+1}}{c-1}=\frac{c}{c-1}\cdot c^n .
+  \]
+  Since $\frac{c}{c-1}$ is a positive constant, $c^n\le g(n)\le\frac{c}{c-1}c^n$, i.e.\ $g(n)=\Theta(c^n)$.
+\end{enumerate}
+
+%======================================================================
+\section*{Exercise 1.14}
+
+\textbf{Idea.} Combine the matrix method of Exercise 0.4 with modular repeated squaring.
+Let $X=\begin{pmatrix}0&1\\1&1\end{pmatrix}$. Since
+$\begin{pmatrix}F_{k+1}\\F_{k+2}\end{pmatrix}=X\begin{pmatrix}F_k\\F_{k+1}\end{pmatrix}$, induction gives
+\[
+  \begin{pmatrix}F_n\\F_{n+1}\end{pmatrix}=X^n\begin{pmatrix}F_0\\F_1\end{pmatrix}
+  =X^n\begin{pmatrix}0\\1\end{pmatrix},
+\]
+so $F_n$ is the top-right entry $(X^n)_{12}$. It therefore suffices to compute $X^n \bmod p$
+(every entry reduced modulo $p$).
+
+\begin{algorithm}[H]
+\caption{Computing $F_n \bmod p$}
+\begin{algorithmic}[1]
+\Function{MatPow}{$n,p$} \Comment{returns $X^n \bmod p$}
+  \If{$n=0$} \State \Return $I_2 \bmod p$ \EndIf
+  \State $Z\gets$ \Call{MatPow}{$\floor{n/2},p$}
+  \State $Z\gets Z\cdot Z \bmod p$
+  \If{$n$ is odd} \State $Z\gets X\cdot Z \bmod p$ \EndIf
+  \State \Return $Z$
+\EndFunction
+\Function{FibMod}{$n,p$}
+  \State \Return the top-right entry of \Call{MatPow}{$n,p$}
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+Here ``$A\cdot B\bmod p$'' means the $2\times2$ matrix product (8 multiplications and 4 additions of
+entries, Exercise 0.4(a)) followed by reducing each of the 4 entries modulo $p$.
+
+\textbf{Correctness.} \textsc{MatPow} follows the recursion
+$X^n=(X^{\floor{n/2}})^2$ for even $n$ and $X^n=X\cdot(X^{\floor{n/2}})^2$ for odd $n$, exactly as in
+modular exponentiation. Every matrix entry is computed from others using only $+$ and $\times$, and
+reduction modulo $p$ commutes with these operations
+($a\equiv a',\,b\equiv b'\Rightarrow a+b\equiv a'+b',\ ab\equiv a'b' \pmod p$).
+Hence by induction on $n$, each entry of the returned matrix is congruent modulo $p$ to the corresponding
+entry of $X^n$, and lies in $\{0,\dots,p-1\}$. In particular \textsc{FibMod} returns $F_n\bmod p$.
+
+\textbf{Running time.} Let $k=\ceil{\log(p+1)}$ be the number of bits of $p$.
+\begin{itemize}[itemsep=0.2em]
+\item The recursion depth is $\floor{\log n}+1=O(\log n)$, and each level performs at most two matrix
+  multiplications, so there are $O(\log n)$ matrix multiplications in total.
+\item All entries are in $[0,p)$, i.e.\ at most $k$ bits. One matrix multiplication does 8 products of
+  $k$-bit numbers ($O(k^2)$ each), 4 additions of $2k$-bit numbers ($O(k)$ each), and 4 reductions of
+  $O(k)$-bit numbers modulo $p$ ($O(k^2)$ each). So one matrix multiplication costs $O(k^2)$.
+\end{itemize}
+The total running time is
+\[
+  O(\log n\cdot\log^2 p)
+\]
+bit operations, which is polynomial in the input size ($\approx\log n+\log p$ bits).
+By contrast, running \texttt{fib2} and reducing modulo $p$ at every step takes $n$ additions,
+i.e.\ $O(n\log p)$ time, which is exponential in the length $\log n$ of $n$.
+
+%======================================================================
+\section*{Exercise 1.20}
+
+We use the extended Euclidean algorithm: $a$ has an inverse modulo $N$ iff $\gcd(a,N)=1$, and if
+$ax+Ny=1$ then $x\bmod N$ is the inverse.
+
+\begin{enumerate}[leftmargin=2.2em, itemsep=0.6em]
+\item $20^{-1}\bmod 79$.
+  \[
+    79=3\cdot20+19,\qquad 20=1\cdot19+1 .
+  \]
+  Back-substituting: $1=20-19=20-(79-3\cdot20)=4\cdot20-1\cdot79$.
+  Hence $20^{-1}\equiv \boxed{4}\pmod{79}$. Check: $20\cdot4=80=79+1$.
+
+\item $3^{-1}\bmod 62$.
+  \[
+    62=20\cdot3+2,\qquad 3=1\cdot2+1 .
+  \]
+  Back-substituting: $1=3-2=3-(62-20\cdot3)=21\cdot3-1\cdot62$.
+  Hence $3^{-1}\equiv \boxed{21}\pmod{62}$. Check: $3\cdot21=63=62+1$.
+
+\item $21^{-1}\bmod 91$.
+  \[
+    91=4\cdot21+7,\qquad 21=3\cdot7+0 ,
+  \]
+  so $\gcd(21,91)=7\neq1$ (indeed $21=3\cdot7$, $91=13\cdot7$). Therefore
+  \textbf{21 has no inverse modulo 91}: if $21x\equiv1\pmod{91}$, then $7$ would divide
+  $21x-91y=1$, which is impossible.
+
+\item $5^{-1}\bmod 23$.
+  \[
+    23=4\cdot5+3,\qquad 5=1\cdot3+2,\qquad 3=1\cdot2+1 .
+  \]
+  Back-substituting:
+  \[
+    1=3-2=3-(5-3)=2\cdot3-5=2(23-4\cdot5)-5=2\cdot23-9\cdot5 .
+  \]
+  Hence $5^{-1}\equiv-9\equiv \boxed{14}\pmod{23}$. Check: $5\cdot14=70=3\cdot23+1$.
+\end{enumerate}
+
+%======================================================================
+\section*{Exercise 1.31}
+
+Let $N$ be an $n$-bit number, so $2^{n-1}\le N<2^n$ and $n-1\le\log N<n$.
+
+\textbf{(a)} The number of bits of $N!$ is $\floor{\log N!}+1=\Theta(\log N!)$. We show
+$\log N!=\Theta(N\log N)$ (Exercise 1.4).
+\begin{itemize}[itemsep=0.2em]
+\item Upper bound: $N!\le N^N$, so $\log N!\le N\log N$.
+\item Lower bound: at least $N/2$ of the factors $1,\dots,N$ are $\ge N/2$, so $N!\ge (N/2)^{N/2}$ and
+  $\log N!\ge\frac N2(\log N-1)\ge\frac N4\log N$ for $N\ge4$.
+\end{itemize}
+Since $N=\Theta(2^n)$ and $\log N=\Theta(n)$, the length of $N!$ is
+\[
+  \Theta(N\log N)=\boxed{\Theta(n\,2^n)}\text{ bits.}
+\]
+
+\textbf{(b)} Algorithm: multiply the numbers one by one.
+
+\begin{algorithm}[H]
+\caption{Computing $N!$}
+\begin{algorithmic}[1]
+\Function{Factorial}{$N$}
+  \State $f\gets1$
+  \For{$i\gets2$ \textbf{to} $N$}
+    \State $f\gets f\cdot i$ \Comment{invariant: after this line, $f=i!$}
+  \EndFor
+  \State \Return $f$
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\emph{Correctness} is immediate from the loop invariant $f=i!$.
+
+\emph{Running time.} Multiplying a $b$-bit number by an $m$-bit number with $m\le b$ by the
+grade-school method adds up $m$ shifted copies of the $b$-bit number, each addition costing $O(b+m)=O(b)$;
+so it takes $O(bm)$ time.
+
+In iteration $i$, the current value $f=(i-1)!\le N!$ has $b=O(\log N!)=O(N\log N)=O(Nn)$ bits by part (a),
+and $i\le N$ has at most $n$ bits. Hence each iteration costs $O(Nn\cdot n)=O(Nn^2)$ (the loop counter
+update is only $O(n)$). With $N-1$ iterations, the total time is
+\[
+  O(N\cdot Nn^2)=O(N^2n^2)=\boxed{O(n^2\,4^n)}.
+\]
+This bound is tight for this algorithm: in each of the last $N/2$ iterations
+($N/2 < i \le N$), $f=(i-1)!\ge (N/2)!$ already has $\Omega(N\log N)=\Omega(Nn)$ bits, and $i$ has at least
+$n-1$ bits, so these iterations alone cost $\Omega(N\cdot Nn\cdot n)$ under the grade-school method.
+
+\begin{remark}
+The running time is exponential in the input length $n$. This is unavoidable for \emph{any} algorithm:
+by (a), merely writing down the output takes $\Theta(n2^n)$ time.
+\end{remark}
+
+%======================================================================
+\section*{Exercise 1.35}
+
+\textbf{(a)} $x$ is its own inverse modulo $p$ iff $x^2\equiv1\pmod p$, i.e.\ $p\mid x^2-1=(x-1)(x+1)$.
+Since $p$ is prime, this holds iff $p\mid x-1$ or $p\mid x+1$, i.e.\ $x\equiv1$ or $x\equiv-1\pmod p$.
+For $1\le x<p$, the self-inverse numbers are therefore exactly
+\[
+  x=1\quad\text{and}\quad x=p-1
+\]
+(for $p=2$ these coincide, leaving only $x=1$).
+
+\textbf{(b)} If $p=2$: $(p-1)!=1\equiv-1\pmod 2$. Now let $p$ be an odd prime and
+$S=\{2,3,\dots,p-2\}$.
+
+Every $x\in S$ has a unique inverse $x^{-1}\in\{1,\dots,p-1\}$ modulo $p$. We claim $x^{-1}\in S$ and
+$x^{-1}\neq x$:
+\begin{itemize}[itemsep=0.2em]
+\item If $x^{-1}=1$, then $x=1$; if $x^{-1}=p-1$, then $x=(p-1)^{-1}=p-1$ (as $p-1$ is self-inverse).
+  Both contradict $x\in S$, so $x^{-1}\in S$.
+\item $x^{-1}\neq x$ by part (a), since $x\notin\{1,p-1\}$.
+\end{itemize}
+Moreover $(x^{-1})^{-1}=x$. Hence $S$ splits into disjoint pairs $\{x,x^{-1}\}$, each with product
+$\equiv1\pmod p$, and so $\prod_{x\in S}x\equiv1\pmod p$ (for $p=3$, $S=\emptyset$ and the empty product is $1$).
+Therefore
+\[
+  (p-1)!=1\cdot\Bigl(\prod_{x\in S}x\Bigr)\cdot(p-1)\equiv1\cdot1\cdot(-1)=-1\pmod p .
+\]
+
+\textbf{(c)} Wilson's theorem concerns $N\ge2$ (modulo $1$ all integers are congruent, so $N=1$ is excluded).
+Let $N\ge2$ be composite and write $N=ab$ with $1<a<N$. Since $a\le N-1$, $a$ is one of the factors of $(N-1)!$, so
+$a\mid(N-1)!$. Also $a\mid N$. Hence
+\[
+  d=\gcd(N,(N-1)!)\ge a>1 .
+\]
+Suppose, for contradiction, that $(N-1)!\equiv-1\pmod N$, i.e.\ $(N-1)!=kN-1$ for some integer $k$. Then
+$d\mid N$ and $d\mid(N-1)!$ imply $d\mid kN-(N-1)!=1$, so $d=1$, a contradiction.
+Thus $(N-1)!\not\equiv-1\pmod N$.
+
+\textbf{(d)} To use the test we must compute $(N-1)!\bmod N$. For an $n$-bit $N$ the straightforward way
+performs $N-2=\Theta(2^n)$ modular multiplications (each $O(n^2)$), which is exponential in the input size $n$.
+Unlike $a^{N-1}\bmod N$ in Fermat's test, which repeated squaring computes with only $O(n)$
+multiplications because all factors are equal, the factors $1,2,\dots,N-1$ of $(N-1)!$ are all different,
+and no polynomial-time algorithm for computing $(N-1)!\bmod N$ is known. So Wilson's theorem, although an exact
+characterization of primes, does not yield an efficient primality test.
+
+\end{document}
