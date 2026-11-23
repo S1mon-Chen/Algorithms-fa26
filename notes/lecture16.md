@@ -1,6 +1,6 @@
 # Lecture 16：NP 问题 II——P、NP、归约与完全性
 
-> 依据：[hand16.pdf](../lectures/hand16.pdf)（26 页讲义）与 [algo16.pdf](../lectures/algo16.pdf)（60 页，含逐步展示的幻灯片）。下文页码按讲义页脚编号。
+> 下文按 26 页讲义的页脚编号引用。逐步展示版 PDF 共 63 页，其中第 23–25 页都对应讲义第 12 页。[讲义 hand16.pdf](../lectures/hand16.pdf) · [逐步展示版 algo16.pdf](../lectures/algo16.pdf)
 > 主线：集合覆盖与图同构 → P 与 NP → 补问题与 co-NP → 有界定理证明与指数时间假设（ETH） → 多项式时间归约 → NP 完全性 → co-NP 完全性与永真式 → 因数分解、质数判定 → NP 中间问题 → Quiz。
 > 标为“补充”“辨析”“例题演算”或“讲义修正”的内容用于补全条件、证明或例子，不是讲义原文。输入长度记为 $\ell=|I|$，整数默认用二进制编码；图默认是有限简单无向图。讲义以搜索问题介绍 P、NP，本文保留这一动机，但讨论补集、完全性和 NPI 时统一使用标准的**判定问题**定义；除特别说明外，$\le_p$ 表示多项式时间多对一归约。
 
@@ -296,7 +296,7 @@ $$
 
 ## 5. 有界定理证明与指数时间假设（第 11–12 页）
 
-### 5.1 P = NP 对定理证明意味着什么？（第 11 页）
+### 5.1 若 P = NP，怎样找到一个短证明？（第 11 页）
 
 讲义给出一个动机：输入数学命题 $\varphi$ 和长度上界 $n$，寻找一个长度至多 $n$ 的形式化证明。
 
@@ -310,7 +310,7 @@ $$
 
 若 $n$ 使用二进制编码，$n$ 可能相对于输入长度指数大，不能仅凭“证明可快速检查”就断言这个有界证明问题属于 NP。另一种足够的条件，是预先把证明长度限制为 $|\varphi|$ 的某个固定多项式。
 
-如果 P = NP，就能高效判定并搜索**在给定界内存在的证明**。但讲义“能证明任何定理、因而不再需要数学家”的说法只是动机性的夸张：
+若 P = NP，对一元编码的长度界 $n$，就能在关于 $|\varphi|+n$ 的多项式时间内判定这样的证明是否存在。有解时，用第 3.5 节的前缀搜索即可逐步写出一份证明。讲义在“这样就不再需要数学家了”的玩笑后加了一句 “It seems so!”。有界证明搜索有以下限制。
 
 - 时间界依赖允许的证明长度，不仅依赖命题本身的长度。
 - 定理不一定有短证明，也不一定在固定形式系统中可证。
@@ -320,13 +320,13 @@ $$
 
 ### 5.2 3-SAT 的指数时间假设（第 12 页）
 
-设 $n$ 是 3-CNF 公式的变量数，$\ell$ 是公式的编码长度。**指数时间假设（Exponential Time Hypothesis，ETH）** 断言，3-SAT 没有最坏情况运行时间为 $2^{o(n)}\operatorname{poly}(\ell)$ 的确定性判定算法。讲义省略关于输入长度的多项式因子，简写为 $2^{o(n)}$。
+设 $n$ 为 3-CNF 公式的变量数，$\ell$ 为公式的编码长度。**指数时间假设（Exponential Time Hypothesis，ETH）** 断言，3-SAT 没有最坏情况运行时间为 $2^{o(n)}\operatorname{poly}(\ell)$ 的确定性判定算法。讲义把关于输入长度的多项式因子略去，简写为 $2^{o(n)}$。
 
-在 $2^{g(n)}$ 中，$g(n)=o(n)$ 表示 $g(n)/n\to 0$。把枚举全部赋值的 $2^n$ 降到 $2^{n/2}$，指数与 $n$ 的比值仍为 $1/2$。若 3-SAT 有 $2^{\sqrt n}\operatorname{poly}(\ell)$ 时间算法，由于 $\sqrt n/n\to 0$，就足以反驳 ETH。
+**讲义引理。** 若 ETH 成立，则 $\mathrm P\ne\mathrm{NP}$。考虑逆否命题。若 $\mathrm P=\mathrm{NP}$，由于 3-SAT 属于 NP，它就有 $\operatorname{poly}(\ell)$ 时间的判定算法。这个时间界可写成 $2^0\operatorname{poly}(\ell)$，而 $0=o(n)$，所以这样的算法会反驳 ETH。
 
-**补充辨析。** 若 $\mathrm P=\mathrm{NP}$，3-SAT 就有 $\operatorname{poly}(\ell)$ 时间算法，已经达到 ETH 所排除的时间界。因此 $\mathrm{ETH}\Rightarrow\mathrm P\ne\mathrm{NP}$。上例中的 $2^{\sqrt n}$ 比任意固定次数的 $n^k$ 增长得都快。要由 3-SAT 推出 P = NP，仍需证明它有关于 $\ell$ 的多项式时间算法。
+**辨析。** 仍省略 $\operatorname{poly}(\ell)$ 因子。时间界 $2^{g(n)}$ 为次指数的条件是 $g(n)/n\to0$。若把枚举全部赋值的 $2^n$ 降到 $2^{n/2}$，指数与 $n$ 的比值仍是 $1/2$，这样的改进与 ETH 相容。若能降到 $2^{\sqrt n}$，则 $\sqrt n/n\to0$，足以反驳 ETH。由于 $2^{\sqrt n}$ 比 $n$ 的任何固定次多项式增长得都快，仅凭这个上界还推不出 P = NP。
 
-**讲义中的研究进展。** 2026 年 10 月，OpenAI 和 Anthropic 分别报告，其内部大语言模型找到了 3-SAT 的次指数时间算法，并据此声称反驳了 ETH。Russell Impagliazzo、Ramamohan Paturi 和 Ryan Williams 邀请学界独立核查反证主张，其中前两人参与提出了 ETH。[OpenAI 公告](https://openai.com/index/building-scientific-understanding-with-academic-communities/) · [Anthropic 预印本](https://github.com/anthropics/formal-math/blob/16a5ce41304fcdaea4e0be7c132e1c361dc26da5/eth/paper.pdf) · [核查小组说明](https://ethdiscussion.blog/2026/10/26/eth-refutation-examination-and-discussion/)
+**讲义提到的研究进展。** 2026 年 10 月，OpenAI 和 Anthropic 分别报告，其内部大语言模型找到了 3-SAT 的次指数时间算法，并据此声称反驳了 ETH。参与提出 ETH 的 Russell Impagliazzo 和 Ramamohan Paturi 随后与 Ryan Williams 共同发起了对 OpenAI 论证的独立核查。[OpenAI 公告](https://openai.com/index/building-scientific-understanding-with-academic-communities/) · [Anthropic 预印本](https://github.com/anthropics/formal-math/blob/16a5ce41304fcdaea4e0be7c132e1c361dc26da5/eth/paper.pdf) · [核查小组公开信](https://ethdiscussion.blog/2026/10/26/eth-refutation-examination-and-discussion/)
 
 ## 6. 多项式时间归约：把 B 的算法变成 A 的算法（第 13–16 页）
 
@@ -908,7 +908,7 @@ $$
 
 ### 11.3 为什么不能直接照抄第 24 页的图？
 
-第 24 页标题已经注明 “A Problematic Category”。其中嵌入的旧图及文字存在几个需要辨析的地方：
+第 24 页题为 “NPI (A Problematic Category)”。读这张关系图时要区分以下几点。
 
 1. **图中的 NPI 覆盖了 NP 与 co-NP 的交集，并包含 P。** 这与下一页“既不在 P、也不是 NP 完全”的 NPI 定义不同。按标准 NP-intermediate 定义，$\mathrm P\subseteq\mathrm{NPI}$ 是错误的。
 2. **图把 PRIME、COMPOSITE 放在 P 外。** AKS 定理已经证明它们都在 P 中，不能将这一位置当作有效分类。
@@ -982,7 +982,7 @@ P 严格小于 NP = co-NP 的情形仍与这个 Quiz 的结论相容。
 | NP 证书定义 | $I\in L\iff\exists S,\ \lvert S\rvert\le p(\lvert I\rvert),\ C(I,S)=1$ |
 | 基本包含 | $\mathrm P\subseteq\mathrm{NP}\cap\mathrm{coNP}$ |
 | co-NP 定义 | $L\in\mathrm{coNP}\iff\overline L\in\mathrm{NP}$ |
-| ETH 若成立 | 3-SAT 没有 $2^{o(n)}\operatorname{poly}(\ell)$ 时间的确定性算法，因此 $\mathrm P\ne\mathrm{NP}$（$n$ 为变量数） |
+| 指数时间假设 | ETH 若成立，则 $\mathrm P\ne\mathrm{NP}$，因为多项式时间的 3-SAT 算法也满足 $2^{o(n)}\operatorname{poly}(\ell)$ 上界 |
 | 多对一归约 | $A\le_p B\iff\exists$ 多项式时间 $f$，使 $I\in A\iff f(I)\in B$ |
 | 易解性传递 | $A\le_p B,\ B\in\mathrm P\Rightarrow A\in\mathrm P$ |
 | 归约传递性 | $A\le_p B,\ B\le_p C\Rightarrow A\le_p C$ |
@@ -1007,7 +1007,7 @@ P 严格小于 NP = co-NP 的情形仍与这个 Quiz 的结论相容。
 | 给出一个坏解就证明无解 | 只排除了这一个候选解 |
 | co-NP 是 NP 的集合补集 | co-NP 是 NP 中各判定问题取补后形成的问题类 |
 | NP $\cap$ co-NP 就是 P | 只知道 P 包含于该交集，不知道是否相等 |
-| 3-SAT 有次指数时间算法就能推出 P = NP | 这样的算法足以反驳 ETH。P = NP 要求 3-SAT 有多项式时间算法 |
+| 找到 3-SAT 的次指数时间算法就能推出 P = NP | 这足以反驳 ETH。要由 3-SAT 推出 P = NP，需要关于输入长度的多项式时间算法 |
 | 证明新问题难，应把它归约到 SAT | 应把已知 NP 完全问题归约到新问题 |
 | 只证明归约一个方向即可 | 必须保证原实例 YES 当且仅当新实例 YES |
 | 构造规则短，就一定是多项式归约 | 还要检查实际输出规模和执行时间 |
@@ -1032,7 +1032,7 @@ P 严格小于 NP = co-NP 的情形仍与这个 Quiz 的结论相容。
 - [ ] 能用量词解释为什么翻转 NP 验证器的答案不能证明 NP 对补封闭。
 - [ ] 能准确区分 co-NP、NP 的集合补集、NP $\cap$ co-NP 和 NPI。
 - [ ] 能说明有界定理证明为何需要一元长度界或多项式长度限制。
-- [ ] 能按变量数 $n$ 陈述 ETH，并用 $2^{\sqrt n}$ 解释反驳 ETH 与证明 P = NP 的区别。
+- [ ] 能按变量数 $n$ 陈述 ETH，证明 ETH 成立会推出 P $\ne$ NP，并解释 $2^{\sqrt n}$ 时间的 3-SAT 算法能推出什么。
 - [ ] 能写出搜索归约的 $f,h$，并分别解释有解与无解时的正确性。
 - [ ] 能说明多对一归约与多次调用判定器的图灵归约有什么区别。
 - [ ] 能用 $A\le_p B$ 正确传递易解性和困难性，不把箭头写反。
